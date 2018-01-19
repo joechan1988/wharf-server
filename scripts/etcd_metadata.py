@@ -2,10 +2,10 @@
 
 import subprocess
 
-def shell_exec(cmd, shell=True):
 
+def shell_exec(cmd, shell=True):
     try:
-        ret = subprocess.check_output(cmd,shell=shell)
+        ret = subprocess.check_output(cmd, shell=shell)
     except subprocess.CalledProcessError as e:
         return e
 
@@ -23,7 +23,7 @@ if "etcd.io" in discovery:
     discovery_http = discovery.replace("https", "http")
 
 start_cmd = "docker run -d --name wharf-meta-etcd \
-                -v /var/lib/etcd-wharf-meta:/var/lib/etcd-wharf-meta \
+                -v /var/lib/wharf/metadata:/var/lib/wharf/metadata \
               --net=host --privileged --restart=on-failure \
                 gcr.io/google-containers/etcd:3.1.11 etcd \
               --name=wharf-meta \
