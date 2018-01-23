@@ -4,19 +4,19 @@ import (
 	restful "github.com/emicklei/go-restful"
 	"net/http"
 	"wharf/wharf-server/src/backend/res"
-
-	"log"
+	"wharf/wharf-server/src/backend/common"
+	"github.com/golang/glog"
 )
 
 type APIHandler struct {
-
+	StoreHandler *common.StoreHandler
 }
 
-func CreateHTTPAPIHandler() (http.Handler, error) {
+func CreateHTTPAPIHandler(storeHandler *common.StoreHandler) (http.Handler, error) {
 
 	wsContainer := restful.NewContainer()
 	wsContainer.EnableContentEncoding(true)
-	apiHandler := APIHandler{}
+	apiHandler := APIHandler{StoreHandler: storeHandler}
 	apiV1Ws := new(restful.WebService)
 
 	apiV1Ws.Path("/api/v1").
@@ -27,18 +27,19 @@ func CreateHTTPAPIHandler() (http.Handler, error) {
 	apiV1Ws.Route(
 		apiV1Ws.GET("/token").To(apiHandler.handleGetToken).Writes(res.Token{}))
 
-	return wsContainer,nil
+	return wsContainer, nil
 }
 
-func (apiHandler *APIHandler) handleGetToken(request *restful.Request,response *restful.Response){
+func (apiHandler *APIHandler) handleGetToken(request *restful.Request, response *restful.Response) {
 
+	glog.Infof("Request to get token...", request)
 
-	log.Print("Request to get token...",request)
-	result,err := res.GetToken()
+	token := request.QueryParameter("token")
+	result, err := res.GetToken(apiHandler.StoreHandler,token)
 	if err != nil {
-		log.Fatalf("Get Token Error",err)
+		glog.Fatalf("Get Token Error", err)
 		return
 	}
 
-	response.WriteHeaderAndEntity(http.StatusOK,result)
+	response.WriteHeaderAndEntity(http.StatusOK, result)
 }
