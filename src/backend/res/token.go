@@ -36,6 +36,13 @@ func GetToken(storeHandler *common.StoreHandler,token string) (*Token, error) {
 
 }
 
+func generateToken() error{
+
+
+
+	return nil
+}
+
 func StoreToken() (error) {
 	return nil
 }

@@ -8,13 +8,14 @@ import (
 	"github.com/golang/glog"
 	"wharf/wharf-server/src/backend/common"
 	"reflect"
-	//"log"
 )
 
 type Endpoint struct {
-	Name string
-	Address string
-	Type string  //apiserver,etcd-clusterdata...
+	Name       string
+	Address    string
+	Type       string //apiserver,etcd-clusterdata...
+	Port       string
+	SecurePort string
 }
 
 type EndpointList struct {
@@ -33,7 +34,7 @@ func CreateEndpoint(storeHandler common.StoreHandler, endpoint Endpoint) error {
 	t := reflect.TypeOf(endpoint)
 	v := reflect.ValueOf(endpoint)
 
-	for k:=0; k<t.NumField(); k++ {
+	for k := 0; k < t.NumField(); k++ {
 		resp, err := kapi.Set(context.Background(),
 			"/endpoint/"+endpoint.Name+"/"+t.Field(k).Name,
 			v.Field(k).String(),
@@ -42,20 +43,10 @@ func CreateEndpoint(storeHandler common.StoreHandler, endpoint Endpoint) error {
 		if err != nil {
 			glog.V(1).Infof("Failed to set key: %s", endpoint.Name)
 			return err
-		}else{
-			glog.Infof("Response: %q\n",resp)
+		} else {
+			glog.Infof("Response: %q\n", resp)
 		}
 	}
-	//resp, err := kapi.Set(context.Background(),
-	//	"/endpoint/"+endpoint.Name+"/IP",
-	//		endpoint.IP,
-	//		nil)
-	//if err != nil {
-	//	glog.V(1).Infof("Failed to set key: %s", endpoint.Name)
-	//} else {
-	//	glog.Infof("Created Endpoint directory: %s", endpoint.Name)
-	//	glog.Infof("Response: %q\n", resp)
-	//}
 
 	return nil
 
